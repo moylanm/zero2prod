@@ -58,7 +58,7 @@ pub async fn publish_newsletter(
                         &subscriber.email,
                         &body.title,
                         &body.content.html,
-                        &body.content.text
+                        &body.content.text,
                     )
                     .await
                     .with_context(|| {
@@ -83,7 +83,7 @@ async fn get_confirmed_subscribers(
 ) -> Result<Vec<Result<ConfirmedSubscriber, anyhow::Error>>, anyhow::Error> {
     // We only need `Row` to map the data coming out of this query
     struct Row {
-        email: String
+        email: String,
     }
 
     let rows = sqlx::query_as!(
