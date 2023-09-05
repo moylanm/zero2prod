@@ -1,4 +1,4 @@
-use crate::helpers::{spawn_app, TestApp, ConfirmationLinks};
+use crate::helpers::{spawn_app, ConfirmationLinks, TestApp};
 use wiremock::matchers::{any, method, path};
 use wiremock::{Mock, ResponseTemplate};
 
@@ -77,7 +77,7 @@ async fn newsletters_returns_400_for_invalid_data() {
         (
             serde_json::json!({"title": "Newsletter!"}),
             "missing content",
-        )
+        ),
     ];
 
     for (invalid_body, error_message) in test_cases {
