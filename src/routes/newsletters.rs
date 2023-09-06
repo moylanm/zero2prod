@@ -192,7 +192,7 @@ async fn validate_credentials(
 
     let expected_password_hash = PasswordHash::new(&expected_password_hash)
         .context("Failed to parse hash in PHC string format.")
-        .map_err(PublishError::UnexpectedError);
+        .map_err(PublishError::UnexpectedError)?;
 
     Argon2::default()
         .verify_password(
@@ -201,6 +201,6 @@ async fn validate_credentials(
         )
         .context("Invalid password.")
         .map_err(PublishError::AuthError)?;
-    
+
     Ok(user_id)
 }
