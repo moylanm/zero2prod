@@ -12,21 +12,17 @@ pub struct QueryParams {
 }
 
 impl QueryParams {
-  fn verify(self, secret: &HmacSecret) -> Result<String, anyhow::Error> {
-    let tag = hex::decode(self.tag)?;
-    let query_string = format!(
-      "error={}",
-      urlencoding::Encoded::new(&self.error)
-    );
+    fn verify(self, secret: &HmacSecret) -> Result<String, anyhow::Error> {
+        let tag = hex::decode(self.tag)?;
+        let query_string = format!("error={}", urlencoding::Encoded::new(&self.error));
 
-    let mut mac = Hmac::<sha2::Sha256>::new_from_slice(
-      secret.0.expose_secret().as_bytes()
-    ).unwrap();
-    mac.update(query_string.as_bytes());
-    mac.verify_slice(&tag)?;
+        let mut mac =
+            Hmac::<sha2::Sha256>::new_from_slice(secret.0.expose_secret().as_bytes()).unwrap();
+        mac.update(query_string.as_bytes());
+        mac.verify_slice(&tag)?;
 
-    Ok(self.error)
-  }
+        Ok(self.error)
+    }
 }
 
 pub async fn login_form(
@@ -38,12 +34,12 @@ pub async fn login_form(
         Some(query) => match query.0.verify(&secret) {
             Ok(error) => format!("<p><i>{}</i></p>", htmlescape::encode_minimal(&error)),
             Err(e) => {
-              tracing::warn!(
-                error.message = %e,
-                error.cause_chain = ?e,
-                "Failed to verify query parameters using the HMAC tag"
-              );
-              "".into()
+                tracing::warn!(
+                  error.message = %e,
+                  error.cause_chain = ?e,
+                  "Failed to verify query parameters using the HMAC tag"
+                );
+                "".into()
             }
         },
     };
