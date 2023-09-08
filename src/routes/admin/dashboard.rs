@@ -1,4 +1,4 @@
-use actix_web::{web, HttpResponse, http::header::ContentType};
+use actix_web::{http::header::ContentType, web, HttpResponse};
 use anyhow::Context;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -8,12 +8,15 @@ use crate::session_state::TypedSession;
 // Return an opaque 500 while preserving the error's root cause for logging
 fn e500<T>(e: T) -> actix_web::Error
 where
-    T: std::fmt::Debug + std::fmt::Display + 'static
+    T: std::fmt::Debug + std::fmt::Display + 'static,
 {
     actix_web::error::ErrorInternalServerError(e)
 }
 
-pub async fn admin_dashboard(session: TypedSession, pool: web::Data<PgPool>) -> Result<HttpResponse, actix_web::Error> {
+pub async fn admin_dashboard(
+    session: TypedSession,
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, actix_web::Error> {
     let username = if let Some(user_id) = session.get_user_id().map_err(e500)? {
         get_username(user_id, &pool).await.map_err(e500)?
     } else {
