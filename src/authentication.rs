@@ -1,6 +1,9 @@
 use crate::telemetry::spawn_blocking_with_tracing;
 use anyhow::Context;
-use argon2::{Argon2, PasswordHash, PasswordVerifier, password_hash::SaltString, Algorithm, Version, Params, PasswordHasher};
+use argon2::{
+    password_hash::SaltString, Algorithm, Argon2, Params, PasswordHash, PasswordHasher,
+    PasswordVerifier, Version,
+};
 use secrecy::{ExposeSecret, Secret};
 use sqlx::PgPool;
 
@@ -93,11 +96,9 @@ fn verify_password_hash(
 pub async fn change_password(
     user_id: uuid::Uuid,
     password: Secret<String>,
-    pool: &PgPool
+    pool: &PgPool,
 ) -> Result<(), anyhow::Error> {
-    let password_hash = spawn_blocking_with_tracing(
-            move || compute_password_hash(password)
-        )
+    let password_hash = spawn_blocking_with_tracing(move || compute_password_hash(password))
         .await?
         .context("Failed to hash password.")?;
     sqlx::query!(
