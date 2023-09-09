@@ -55,6 +55,6 @@ pub async fn change_password(
         FlashMessage::error("Password must be between 12 and 128 characters in length.").send();
         return Ok(see_other("/admin/password"));
     }
-    
+
     todo!()
 }
