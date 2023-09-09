@@ -50,8 +50,7 @@ pub async fn change_password(
         };
     }
 
-    let password_len = form.0.new_password.expose_secret().len();
-    if password_len < 12 || password_len > 128 {
+    if !(12..=128).contains(&form.0.new_password.expose_secret().len()) {
         FlashMessage::error("Password must be between 12 and 128 characters in length.").send();
         return Ok(see_other("/admin/password"));
     }
