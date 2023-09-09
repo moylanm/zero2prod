@@ -34,10 +34,11 @@ pub async fn change_password(
         .send();
         return Ok(see_other("/admin/password"));
     }
+
     let username = get_username(user_id, &pool).await.map_err(e500)?;
     let credentials = Credentials {
         username,
-        password: form.0.current_password,
+        password: form.0.current_password.clone(),
     };
     if let Err(e) = validate_credentials(credentials, &pool).await {
         return match e {
@@ -48,5 +49,12 @@ pub async fn change_password(
             AuthError::UnexpectedError(_) => Err(e500(e).into()),
         };
     }
+
+    let password_len = form.0.current_password.expose_secret().len();
+    if password_len < 12 || password_len > 128 {
+        FlashMessage::error("Password must be between 12 and 128 characters in length.").send();
+        return Ok(see_other("/admin/password"));
+    }
+    
     todo!()
 }
